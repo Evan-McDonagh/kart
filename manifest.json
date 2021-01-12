@@ -1,0 +1,15 @@
+{
+    "name": "Kart",
+    "version": "0.0.1",
+    "description": "Kart is an extension for playing and looping Mario Kart music with desired intervals.",
+    "permissions": ["activeTab", "declarativeContent", "storage"],
+    "background": {
+        "scripts": ["src/howler.js","src/background.js"],
+        "persistent": true
+    },
+    "page_action": {
+        "default_popup": "popup/popup.html"
+    },
+    "options_page": "options.html",
+    "manifest_version": 2
+}
