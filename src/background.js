@@ -3,31 +3,38 @@ var currentTrack;
 var nowPlaying;
 
 sound = new Howl({
-    src: ['../tracks/mariokart64/' + "01" + '.m4a'],
+    src: ['tracks/mariokart64/' + "01" + '.m4a'],
     loop: true,
     usingWebAudio: true
 });
 
-function playTrack(sound,track) {
-    sound.src = ['../tracks/mariokart64/' + track + '.m4a']
-    sound.play();
+function playTrack(track) {
+    if (currentTrack == track) {
+        nowPlaying = track;
+        sound.play();
+    } else {
+        currentTrack = track;
+        nowPlaying = track;
+        sound.stop();
+        sound = new Howl({
+            src: ['tracks/mariokart64/' + currentTrack + '.m4a'],
+            loop: true,
+            usingWebAudio: true
+        });
+        sound.play();
+    }
 } 
 
 chrome.runtime.onMessage.addListener(
     function(request,sender,sendResponse) {
         nowPlaying = request.nowPlaying;
-        console.log(request.nowPlaying);
-        if (sound.playing()) {
+        if (request.play) {
             sound.pause();
-            nowPlaying = "nothing"
+            nowPlaying = "nothing";
+        } else {
+            playTrack(request.nowPlaying);
         }
-        else if (!sound.playing() && request.nowPlaying != currentTrack) {
-            currentTrack = request.nowPlaying;
-            playTrack(sound,request.nowPlaying);
-        }
-        else if (!sound.playing() && request.nowPlaying == currentTrack) {
-            sound.play();
-        }
+
         sendResponse("Now playing" + nowPlaying);
     }
 );
