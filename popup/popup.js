@@ -1,21 +1,55 @@
 let playButton = document.getElementById('playButton');
 let trackSelect = document.getElementById('trackSelect');
-let play = false;
+let timeSelect = document.getElementById('timeSelect');
+
+let pause = true;
 var selectedTrack;
+var newTrack = true;
+var newTime = timeSelect.value;
+var message;
 
 function playTrack(track) {
-    chrome.runtime.sendMessage({play: play, nowPlaying: track}, function(response) {
-        console.log(response.farewell);
+    message = {
+        pause: pause, 
+        nowPlaying: track,
+        newTrack: newTrack,
+        newTime: newTime,
+    };
+    chrome.runtime.sendMessage(
+        message,
+        function(response) {
+            console.log(response.farewell);
     })
 }
 
+// Play/pause button
 playButton.onclick = function(element) {
     selectedTrack = document.getElementById('trackSelect').value;
-    play = play ? false : true;
+    pause = pause ? false : true;
     playTrack(selectedTrack);
 }
 
+// Track select change
 trackSelect.onchange = function(element) {
     selectedTrack = document.getElementById('trackSelect').value;
+    newTrack = true;
     playTrack(selectedTrack);
 }
+
+// Time change
+timeSelect.onchange = function(element) {
+    newTrack = false;
+    newTime = document.getElementById("timeSelect").value;
+    playTrack(selectedTrack);
+}
+
+// Listen for background changes
+chrome.runtime.onMessage.addListener(
+    function(request,sender,sendResponse) {
+        document.getElementById('trackSelect').value=request.track;
+        selectedTrack = request.track;
+        newTrack = true;
+
+        sendResponse("Selected " + request.track);
+    }
+);
