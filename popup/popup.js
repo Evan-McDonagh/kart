@@ -2,6 +2,11 @@ let playButton = document.getElementById('playButton');
 let trackSelect = document.getElementById('trackSelect');
 let timeSelect = document.getElementById('timeSelect');
 
+chrome.storage.sync.get(['track','loopTime'], function(result) {
+    trackSelect.value = result.track;
+    timeSelect.value = result.loopTime;
+});
+
 let pause = true;
 var selectedTrack;
 var newTrack = true;
@@ -53,3 +58,9 @@ chrome.runtime.onMessage.addListener(
         sendResponse("Selected " + request.track);
     }
 );
+
+chrome.storage.onChanged.addListener(
+    function(changes) {
+        trackSelect.value = changes.track.newValue;
+    }
+)

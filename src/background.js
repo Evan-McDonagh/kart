@@ -1,12 +1,16 @@
 var sound;
-var currentTrack;
-var nowPlaying;
+var currentTrack = '01';
+var nowPlaying = 'nothing';
 var seconds = 0;
 var loopTime = 5;
 var loopTimeChanged = false;
 var paused;
 var start = true;
 var newTrack;
+
+chrome.storage.sync.set({track: currentTrack})
+chrome.storage.sync.set({loopTime: loopTime})
+
 
 const tracks = ["01", "02"];
 
@@ -30,19 +34,13 @@ function playTrack(track) {
             usingWebAudio: true
         });
         sound.play();
+        chrome.storage.sync.set({track: currentTrack})
     }
 } 
 
 function nextTrack() {
     newTrack = tracks[parseInt(currentTrack) % tracks.length]
-    chrome.runtime.sendMessage(
-        {track: newTrack},
-        function(response) {
-            console.log(response);
-        }
-    )
     playTrack(newTrack); 
-
 }
 
 function setLoopTime(newtime) {
@@ -52,6 +50,7 @@ function setLoopTime(newtime) {
         loopTime = newtime;
     }
     loopTimeChanged = true;
+    chrome.storage.sync.set({loopTime: loopTime});
 }
 
 function pause() {
@@ -92,5 +91,7 @@ function tick() {
         seconds = 0;
     }
 }
+
+chrome.browserAction.onClicked.addListener(function() { console.log('icon clicked')});
 
 setInterval(tick,1000);
